@@ -1,9 +1,17 @@
 import pandas as pd
 import random
+import numpy
+from scipy.stats import pearsonr
 #returns a data frame that it generates from asking the user questions
 def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None):
     header=["id","pay","jobTitle","yearsAtCompany","hiredBy","promotedLastBy","performanceMetric","age","gender","isImmigrant","physicalDisability","neurodivergent","recordOfOffences"]
-    data=pd.DataFrame(columns=header)
+    dtypes = {
+    "id": int,
+    "pay": float,
+    "age": int,
+    #rest of columns need to be added
+    }
+    data=pd.DataFrame(columns=header).astype(dtypes)
     if(numEmployee is None):
         numEmployee=int(input("enter the number of employess in this company: "))
     if(pay==None):
@@ -29,15 +37,21 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         data = pd.concat([data, new_row_df], ignore_index=True)
         data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
-
+    return data
 
 #creates an employee as a array and returns it
 #employeeNumber	pay	yearsAtCompany	hiredBy	promotedLastBy	performanceMetric	age	gender	isImmigrant	physicalDisability	neurodivergent	recordOfOffences
 def createEmployee(id=None,pay=None,jobTitle=None,yearsAtCompany=None,hiredBy=None,promotedLastBy=None,performanceMetric=None,age=None,gender=None,isImmigrant=None,physicalDisability=None,neurodivergent=None,recordOfOffences=None):
     return[id,pay,jobTitle,yearsAtCompany,hiredBy,promotedLastBy,performanceMetric,age,gender,isImmigrant,physicalDisability,neurodivergent,recordOfOffences]
 
+def checkCorrelation(df, col1, col2):
+    correlation, pValue = pearsonr(df[col1], df[col2])
+    print(f"{correlation:.2f}")
+    print(f"{pValue:.2f}")
+    return correlation, pValue
 
 #numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
 def tester():
-    createData(1000,100,10,30,10,None,100)
+    df = createData(1000,100,10,30,10,None,100)
+    checkCorrelation(df, "age", "pay")
 tester()
