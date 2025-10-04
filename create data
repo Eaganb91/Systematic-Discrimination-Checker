@@ -70,7 +70,31 @@ def checkCorrelation(df, col1, col2):
     return correlation, pValue
 
 #numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
-def tester():
-    df = createData(1000,100,10,30,10,None,100)
-    checkCorrelation(df, "age", "pay")
-tester()
+def main():
+    while True:
+        tableData = input("Do you want to generate test data or input a preexisting file?Y/N: ")
+        try:
+            if tableData == "Y":
+                df = createData(1000,100,10,30,10,None,100)
+                break
+            elif tableData == "N":
+                filePath = input("Enter the file path to a csv file").strip()
+                df = pd.read_csv(filePath)
+                break
+        except ValueError:
+            print("Enter Y for test data, enter N for your own file: ")
+    while True:
+        compare = input("Enter the numeric categories you would like to compare seperated by a space, enter 'exit' to stop: ")
+        if compare.lower() == "exit":
+            break
+        try:
+            firstCol, secondCol = compare.split()
+            if pd.api.types.is_numeric_dtype(df[firstCol]) and pd.api.types.is_numeric_dtype(df[secondCol]):
+                checkCorrelation(df, firstCol, secondCol)
+            else:
+                print("Enter two valid numeric column names seperated by a space: ")
+        except ValueError:
+            print("Enter two valid numeric column names seperated by a space: ")
+        except KeyError:
+            print("One or both column names do not exist: ")
+main()
