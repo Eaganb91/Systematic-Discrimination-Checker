@@ -1,20 +1,25 @@
-#this file is done to create test data for other functions. right now it only generates data for age pay and company id and allows for a corelation between pay and age with the option for variance
-
 import pandas as pd
 import random
 #returns a data frame that it generates from asking the user questions
-def createData():
+def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None):
     header=["id","pay","jobTitle","yearsAtCompany","hiredBy","promotedLastBy","performanceMetric","age","gender","isImmigrant","physicalDisability","neurodivergent","recordOfOffences"]
     data=pd.DataFrame(columns=header)
-    numEmployee=int(input("enter the number of employess in this company: "))
-    pay=int(input("enter a average salarie: "))
-    payVariance=int(input("enter a pay variance: "))
-    jobTitle=None
-    age=int(input("enter an average age"))
-    ageVariance=int(input("enter variance for age"))
-    ageCorrelation=float(input("enter the correlation between age and pay"))
-    correlationVariance=int(input("enter how concistent the correlation is out of 100"))
+    if(numEmployee is None):
+        numEmployee=int(input("enter the number of employess in this company: "))
+    if(pay==None):
+        pay=int(input("enter a average salarie: "))
+    if(payVariance==None):
+        payVariance=int(input("enter a pay variance: "))
+    if(age==None):
+        age=int(input("enter an average age"))
+    if(age==None):
+        ageVariance=int(input("enter variance for age"))
+    if(ageCorrelation==None):
+        ageCorrelation=float(input("enter the correlation between age and pay"))
+    if(correlationVariance==None):
+        correlationVariance=int(input("enter how concistent the correlation is out of 100"))
     #formula for pay change is going to be newPay=pay*(mean(age)-age)*ageCorrelation*correlationVariance
+
 
 
     print("generating", numEmployee, "employees")
@@ -22,9 +27,9 @@ def createData():
     for i in range(numEmployee):
         new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),None,None,None,None,None,age+random.randint(-ageVariance,ageVariance))], columns=data.columns)
         data = pd.concat([data, new_row_df], ignore_index=True)
-        data.loc[i,"pay"]=data.loc[i,"pay"]*((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
+        data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
-    return data
+
 
 #creates an employee as a array and returns it
 #employeeNumber	pay	yearsAtCompany	hiredBy	promotedLastBy	performanceMetric	age	gender	isImmigrant	physicalDisability	neurodivergent	recordOfOffences
@@ -32,7 +37,7 @@ def createEmployee(id=None,pay=None,jobTitle=None,yearsAtCompany=None,hiredBy=No
     return[id,pay,jobTitle,yearsAtCompany,hiredBy,promotedLastBy,performanceMetric,age,gender,isImmigrant,physicalDisability,neurodivergent,recordOfOffences]
 
 
-
+#numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
 def tester():
-    createData()
+    createData(1000,100,10,30,10,None,100)
 tester()
