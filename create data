@@ -3,13 +3,22 @@ import random
 import numpy
 from scipy.stats import pearsonr
 #returns a data frame that it generates from asking the user questions
-def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None):
+def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None,genderRatio=50,isImigrantRatio=10,phyisicalDisabilityRatio=5,neurodivergentRatio=10,recordOfOffences=5):
     header=["id","pay","jobTitle","yearsAtCompany","hiredBy","promotedLastBy","performanceMetric","age","gender","isImmigrant","physicalDisability","neurodivergent","recordOfOffences"]
     dtypes = {
-    "id": int,
-    "pay": float,
-    "age": int,
-    #rest of columns need to be added
+        "id": 'Int64',               # Use nullable Int64 for integers
+        "pay": float,
+        "jobTitle": 'string',        # Use dedicated Pandas string type
+        "yearsAtCompany": 'Int64',
+        "hiredBy": 'string',
+        "promotedLastBy": 'string',
+        "performanceMetric": float,  # Added the missing column
+        "age": 'Int64',
+        "gender": 'Int64',
+        "isImmigrant": 'Int64',
+        "physicalDisability": 'Int64',
+        "neurodivergent": 'Int64',
+        "recordOfOffences": 'Int64'
     }
     data=pd.DataFrame(columns=header).astype(dtypes)
     if(numEmployee is None):
@@ -26,7 +35,7 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         ageCorrelation=float(input("enter the correlation between age and pay"))
     if(correlationVariance==None):
         correlationVariance=int(input("enter how concistent the correlation is out of 100"))
-    
+
     numManage=10
     #formula for pay change is going to be newPay=pay*(mean(age)-age)*ageCorrelation*correlationVariance
     print("generating", numEmployee, "employees")
@@ -37,12 +46,20 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
             numManage=numManage-1
         else:
             manage=0
-        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,None,None,None,None,age+random.randint(-ageVariance,ageVariance))], columns=data.columns)
+        seed=random.randint(1,100)
+
+
+
+        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,None,None,None,None,age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
         data = pd.concat([data, new_row_df], ignore_index=True)
         data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
     return data
-
+def pick(seed,ratio):
+    if(seed>ratio):
+        return 0
+    else:
+        return 1
 #creates an employee as a array and returns it
 #employeeNumber	pay	yearsAtCompany	hiredBy	promotedLastBy	performanceMetric	age	gender	isImmigrant	physicalDisability	neurodivergent	recordOfOffences
 def createEmployee(id=None,pay=None,jobTitle=None,yearsAtCompany=None,hiredBy=None,promotedLastBy=None,performanceMetric=None,age=None,gender=None,isImmigrant=None,physicalDisability=None,neurodivergent=None,recordOfOffences=None):
@@ -55,16 +72,7 @@ def checkCorrelation(df, col1, col2):
     return correlation, pValue
 
 #numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
-def main():
+def tester():
     df = createData(1000,100,10,30,10,None,100)
-    while True:
-        compare = input("Enter the categories you would like to compare seperated by a space, enter 'exit' to stop: ")
-        if compare.lower() == "exit":
-            break
-        try:
-            firstCol, secondCol = compare.split()
-            checkCorrelation(df, firstCol, secondCol)
-        except ValueError:
-            print("Enter two valid column names seperated by a space: ")
-main()
-
+    checkCorrelation(df, "age", "pay")
+tester()
