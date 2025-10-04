@@ -26,14 +26,18 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         ageCorrelation=float(input("enter the correlation between age and pay"))
     if(correlationVariance==None):
         correlationVariance=int(input("enter how concistent the correlation is out of 100"))
+    
+    numManage=10
     #formula for pay change is going to be newPay=pay*(mean(age)-age)*ageCorrelation*correlationVariance
-
-
-
     print("generating", numEmployee, "employees")
 
     for i in range(numEmployee):
-        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),None,None,None,None,None,age+random.randint(-ageVariance,ageVariance))], columns=data.columns)
+        if numManage>0:
+            manage=1
+            numManage=numManage-1
+        else:
+            manage=0
+        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,None,None,None,None,age+random.randint(-ageVariance,ageVariance))], columns=data.columns)
         data = pd.concat([data, new_row_df], ignore_index=True)
         data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
