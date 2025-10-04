@@ -10,6 +10,8 @@ data = {
 
 df = pd.DataFrame(data)
 
-correlation, pValue = pearsonr(df["Age"], df["Salary"])
-print(f"{correlation:.2f}")
-print(f"{pValue:.2f}")
+def checkCorrelation(df, col1, col2):
+    correlation, pValue = pearsonr(df[col1], df[col2])
+    print(f"{correlation:.2f}")
+    print(f"{pValue:.2f}")
+    return correlation, pValue
