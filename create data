@@ -64,7 +64,7 @@ def main():
         try:
             firstCol, secondCol = compare.split()
             checkCorrelation(df, firstCol, secondCol)
-        except:
+        except ValueError:
             print("Enter two valid column names seperated by a space: ")
 main()
 
