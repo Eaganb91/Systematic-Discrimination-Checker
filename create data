@@ -3,7 +3,7 @@ import random
 import numpy
 from scipy.stats import pearsonr
 #returns a data frame that it generates from asking the user questions
-def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None,genderRatio=50,isImigrantRatio=10,phyisicalDisabilityRatio=5,neurodivergentRatio=10,recordOfOffences=5):
+def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None,genderRatio=50,isImigrantRatio=10,phyisicalDisabilityRatio=5,neurodivergentRatio=10,recordOfOffences=5,years=5,yearsVariance=4,performanceAverage=7,performanceVariance=3):
     header=["id","pay","jobTitle","yearsAtCompany","hiredBy","promotedLastBy","performanceMetric","age","gender","isImmigrant","physicalDisability","neurodivergent","recordOfOffences"]
     dtypes = {
         "id": 'Int64',               # Use nullable Int64 for integers
@@ -48,9 +48,7 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
             manage=0
         seed=random.randint(1,100)
 
-
-
-        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,None,None,None,None,age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
+        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,years+random.randint(-yearsVariance,yearsVariance),None,None,performanceAverage+random.randint(-performanceVariance,performanceVariance),age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
         data = pd.concat([data, new_row_df], ignore_index=True)
         data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
