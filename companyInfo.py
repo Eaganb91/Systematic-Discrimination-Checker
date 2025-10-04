@@ -17,8 +17,6 @@ genderSum = len(file["gender"])
 womanDistribution = (womanSum / genderSum) * 100
 
 
-print(f"Gender Split {womanDistribution:.2f}%")
-
 avgPayMen = file.loc[file["gender"] == "M", "pay"].mean()
 avgPayWomen = file.loc[file["gender"] == "W", "pay"].mean()
 
