@@ -58,7 +58,7 @@ def checkCorrelation(df, col1, col2):
 def main():
     df = createData(1000,100,10,30,10,None,100)
     while True:
-        compare = input("Enter the categories you would like to compare seperated by a space, enter 'exit' to stop.")
+        compare = input("Enter the categories you would like to compare seperated by a space, enter 'exit' to stop: ")
         if compare.lower() == "exit":
             break
         try:
