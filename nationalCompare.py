@@ -3,6 +3,9 @@
 import pandas as pd
 
 #replace with entered file from above
+import pandas as pd
+
+#replace with entered file from above
 file = pd.read_csv(r'C:\Users\2gavi\Downloads\example company spredsheet - Sheet1(2).csv')
 print(file.head())
 
@@ -11,19 +14,39 @@ meanAge = file["age"].mean()
 meanTenure = file["yearsAtCompany"].mean()
 
 #National Compare
-
 medianPay = file["pay"].median()
-
 womanSum = (file["gender"] == "W").sum()
 genderSum = len(file["gender"])
-womanDistribution = ((womanSum / genderSum) * 100)
-
-print(f"Gender Split {womanDistribution:.2f}%")
+femaleProportion = ((womanSum / genderSum) * 100)
+#print(f"Gender Split {womanDistribution:.2f}%")
 
 avgPayMen = file.loc[file["gender"] == "M", "pay"].mean()
 avgPayWomen = file.loc[file["gender"] == "W", "pay"].mean()
 
 payGap = ((avgPayMen - avgPayWomen) / avgPayMen) * 100
+
+#display info
+
+print("COMPANY INFORMATION:")
+print("------------------------------------------")
+print("Proportion of protected classes breakdown:")
+mentalDisabilityCounter = (file["neurodivergent"] == 1).sum()
+mentalDisabilityProportion = (mentalDisabilityCounter / genderSum) * 100
+print(f"Mental Disability: {mentalDisabilityProportion:.2f}%")
+
+physicalDisabilityCounter = (file["physicalDisability"] == 1).sum()
+physicalDisabilityProportion = (physicalDisabilityCounter / genderSum)
+print(f"Physical Disability: {physicalDisabilityProportion:.2f}%")
+
+offencesCounter = (file["recordOfOffences"] == 1).sum()
+criminalProportion = (offencesCounter / genderSum) * 100
+print(f"Record of Offences: {criminalProportion:.2f}%")
+
+immigrantCounter = (file["isImmigrant"] == 1).sum()
+immigrantProportion = (immigrantCounter / genderSum) * 100
+print(f"Immigrant Proportion: {immigrantProportion:.2f}%")
+print("------------------------------------------")
+
 
 ##CUT TO HERE
 
@@ -63,8 +86,11 @@ def resultPrint(diff: float, metric_name: str):
 industryHashMap = {}
 for i, name in enumerate(industryValues.keys()):
     industryHashMap[i + 1] = name
+print("----------------------------------------------------------------------------------------------------")
 for key, i in industryHashMap.items():
     print(f"{key}. {i}")
+print("----------------------------------------------------------------------------------------------------")
+
 
 while True:
     try:
@@ -87,11 +113,11 @@ while True:
         print(f"{values[2]:>13.2f}$ ", end = "")
 
         print("\nYour Company:", end = " ")
-        print(f"{womanDistribution:>10.2f}% ", end ="")
+        print(f"{femaleProportion:>10.2f}% ", end ="")
         print(f"{medianPay:>18.2f}$ ", end = "")
         print(f"{payGap:>13.2f}$ ", end ="")
 
-        distDiff = womanDistribution - values[0]
+        distDiff = femaleProportion - values[0]
         payDiff = medianPay - values[1]
         gapDiff = payGap - values[2]
 
@@ -99,6 +125,8 @@ while True:
         resultPrint(distDiff, "proportion of females")
         resultPrint(payDiff, "median pay")
         resultPrint(gapDiff, "gender pay gap")
+        print("----------------------------------------------------------------------------------------------------")
+
 
     if selectIndustry == -1:
         break
