@@ -23,6 +23,7 @@ FUNCTIONS
 
 
 Ensure you have the following python packages installed:
+-Python
 -pandas
 -numpy
 -scipi
