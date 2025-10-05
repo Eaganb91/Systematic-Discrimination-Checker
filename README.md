@@ -17,6 +17,7 @@ Ensure you have the following python packages installed:
 -scipi
 
 Future Improvements:
+
 -encrypt files to protect client information
 
 -Add more protected class's
