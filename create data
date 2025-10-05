@@ -11,7 +11,7 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         "jobTitle": 'string',        # Use dedicated Pandas string type
         "yearsAtCompany": 'Int64',
         "hiredBy": 'string',
-        "promotedLastBy": 'string',
+        "promotedLastBy": 'Int64Y',
         "performanceMetric": float,  # Added the missing column
         "age": 'Int64',
         "gender": 'Int64',
@@ -48,7 +48,7 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
             manage=0
         seed=random.randint(1,100)
 
-        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,years+random.randint(-yearsVariance,yearsVariance),None,None,performanceAverage+random.randint(-performanceVariance,performanceVariance),age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
+        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,years+random.randint(-yearsVariance,yearsVariance),None,random.randint(0,1),performanceAverage+random.randint(-performanceVariance,performanceVariance),age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
         data = pd.concat([data, new_row_df], ignore_index=True)
         data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
@@ -65,10 +65,41 @@ def createEmployee(id=None,pay=None,jobTitle=None,yearsAtCompany=None,hiredBy=No
 
 def checkCorrelation(df, col1, col2):
     correlation, pValue = pearsonr(df[col1], df[col2])
-    print(f"{correlation:.2f}")
-    print(f"{pValue:.2f}")
-    return correlation, pValue
+    #print(f"{correlation:.2f}")
+    #print(f"{pValue:.2f}")
+    return correlation, pValue,col1,col2
 
+def printCorrelation(correlation,pValue,col1,col2):
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    RESET = '\033[0m'
+    #print(correlation,pValue)
+    if(pValue>0.05):
+        print(f"{GREEN}there is no correlation at a 95 percent confidence interval between {col1} and {col2}{RESET}")
+    else:
+        print(f"{RED}there is evidence there is a correlation between {col1} and {col2}{RESET}")
+    print("")
+
+
+def compareProtected(df,correlator):
+    print("Checking correlation for a correlation between pay and catagories protected under the Ontario human rights code:")
+    printCorrelation(*(checkCorrelation(df,correlator,"age")))
+    printCorrelation(*(checkCorrelation(df,correlator,"gender")))
+    printCorrelation(*(checkCorrelation(df,correlator,"isImmigrant")))
+    printCorrelation(*(checkCorrelation(df,correlator,"physicalDisability")))
+    printCorrelation(*(checkCorrelation(df,correlator,"neurodivergent")))
+    printCorrelation(*(checkCorrelation(df,correlator,"recordOfOffences")))
+
+
+def checkPromoter(df):
+    promoters=[]
+    for i in df.loc[:"promotedLastBy"]:
+        promoters.append(i)
+    promoters=set(promoters)
+    for p in promoters:
+        compareProtected(df,"promotedLastBy")
+
+    
 #numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
 def main():
     while True:
@@ -82,19 +113,17 @@ def main():
                 df = pd.read_csv(filePath)
                 break
         except ValueError:
-            print("Enter Y for test data, enter N for your own file: ")
+            print("Enter Y for test data, enter N to input your own file: ")
     while True:
-        compare = input("Enter the numeric categories you would like to compare seperated by a space, enter 'exit' to stop: ")
-        if compare.lower() == "exit":
-            break
-        try:
-            firstCol, secondCol = compare.split()
-            if pd.api.types.is_numeric_dtype(df[firstCol]) and pd.api.types.is_numeric_dtype(df[secondCol]):
-                checkCorrelation(df, firstCol, secondCol)
-            else:
-                print("Enter two valid numeric column names seperated by a space: ")
-        except ValueError:
-            print("Enter two valid numeric column names seperated by a space: ")
-        except KeyError:
-            print("One or both column names do not exist: ")
+        print("1. Check for corellation's between pay and things protected class's in Ontario human rights law")
+        print("2. Check for corellation's between promoters on things protected class's in Ontario human rights law")
+        compare = int(input("Enter your input: "))
+        if compare==1:
+            #print out the wether each function has a correlation
+            print("checking everything for comparison")
+            compareProtected(df,"pay")
+        if compare==2:
+            print("checking each employee in charged of promoting for bias's")
+            checkPromoter(df)
 main()
+
