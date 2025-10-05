@@ -105,6 +105,15 @@ def checkPromoter(df):
         print("checking if employer",p,"has systematic bias in there promotion decisions")
         compareProtected(dfCopy,"promotedLastBy")
     
+
+def createCorrelation(df):
+    y=input("enter what variable to have a correlation with(pay or hiredBy work best)")
+    strength=float(input("enter how strong you want the correlation to be. one Being maximumly strong"))
+    x=input("enter what protected class you want to have a correlation with")
+    variance=int(input("enter the variance of the correlation. enter 0 for no variance"))
+    df[y]=df[y]+df[y]*df[x]*strength
+    print(df)
+    return df
 #numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
 def main():
     while True:
@@ -122,6 +131,7 @@ def main():
     while True:
         print("1. Check for corellation's between pay and things protected class's in Ontario human rights law")
         print("2. Check for corellation's between promoters on things protected class's in Ontario human rights law")
+        print("3. Creates a correlation in the test data")
         compare = int(input("Enter your input: "))
         if compare==1:
             #print out the wether each function has a correlation
@@ -130,5 +140,9 @@ def main():
         if compare==2:
             print("checking each employee in charged of promoting for bias's")
             checkPromoter(df)
+        if compare==3:
+            df=createCorrelation(df)
 main()
+
+
 
