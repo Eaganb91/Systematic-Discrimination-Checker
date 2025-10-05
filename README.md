@@ -18,6 +18,9 @@ Ensure you have the following python packages installed:
 
 Future Improvements:
 -encrypt files to protect client information
+
 -Add more protected class's
+
 -add support for missing values
+
 -create a ui for clients with less teck literacy
