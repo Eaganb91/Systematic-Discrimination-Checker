@@ -138,7 +138,7 @@ def createCorrelation(df):
     print("5. neurodivergent")
     print("6 record of offenses")
     xInput=int(input("enter the number: "))
-    x=["age","gender","isImmigrant","physicalDisability","neurodivergent","recordsOfOffences"][xInput-1]
+    x=["age","gender","isImmigrant","physicalDisability","neurodivergent","recordOfOffences"][xInput-1]
     variance=int(input("enter the variance of the correlation. enter 0 for no variance"))
     base_effect = df[y].abs().mean() * strength
     df[y]=df[y]+df[x]*base_effect
