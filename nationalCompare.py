@@ -1,7 +1,9 @@
+##CUT FROM NATIONAL COMPARE
+
 import pandas as pd
 
-'''
-file = pd.read_csv(r'c:\Users\2gavi\Downloads\example company spredsheet - Sheet1.csv')
+#replace with entered file from above
+file = pd.read_csv(r'C:\Users\2gavi\Downloads\example company spredsheet - Sheet1(2).csv')
 print(file.head())
 
 #avg finders
@@ -16,18 +18,17 @@ womanSum = (file["gender"] == "W").sum()
 genderSum = len(file["gender"])
 womanDistribution = ((womanSum / genderSum) * 100)
 
-
 print(f"Gender Split {womanDistribution:.2f}%")
 
 avgPayMen = file.loc[file["gender"] == "M", "pay"].mean()
 avgPayWomen = file.loc[file["gender"] == "W", "pay"].mean()
 
 payGap = ((avgPayMen - avgPayWomen) / avgPayMen) * 100
-'''
+
+##CUT TO HERE
 
 
-
-
+#dictionnary to hold industry values
 industryValues = {
     "Agriculture, forestry, fishing, hunting, mining, quarrying, oil and gas extraction, and utilities": [24.1, 40.00, 9.3],
     "Construction": [14.5, 32.00, 14.5],
@@ -46,32 +47,58 @@ industryValues = {
     "Public administration": [50.3, 40.00, 7.8]
 }
 
-industryHashMap = {i+1: name for i, name in enumerate(industryValues.keys())}
+#function to print if your company does/does not beat national average
+def resultPrint(diff: float, metric_name: str):
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    RESET = "\033[0m"
+    if diff > 0:
+        print(f"{GREEN}Your company has a higher {metric_name} than the industry average.{RESET}")
+    elif diff == 0:
+        print(f"Your company has a {metric_name} on par with the industry average.")
+    else:
+        print(f"{RED}Your company has a lower {metric_name} than the industry average.{RESET}")
 
-for key, industry in industryHashMap.items():
-    print(f"{key}. {industry}")
+#create a hasmap to link user choice to specific industry
+industryHashMap = {}
+for i, name in enumerate(industryValues.keys()):
+    industryHashMap[i + 1] = name
+for key, i in industryHashMap.items():
+    print(f"{key}. {i}")
 
 while True:
-    selectIndustry = int(input("\nPlease enter the associated int value of the value you would like to compare to (enter '-1' to skip):"))
+    try:
+        selectIndustry = int(input("\nPlease enter the associated int value of the value you would like to compare to (enter '-1' to skip): "))
+    except ValueError:
+        print("Please only enter int values (0-9)")
+        continue
+
     if selectIndustry in industryHashMap:
         counter = 0
         comparedIndustry = industryHashMap[selectIndustry]
         values = industryValues[comparedIndustry]
-        
-        print(comparedIndustry)
-        print("                 Proportion of Women - Median Hourly Wage - Pay Gap\n")
+        #control for string
+        print("\n"+comparedIndustry)
+        print("           Proportion of Women - Median Hourly Wage - Pay Gap\n")
+
         print("Industry:", end = " ")
-        for i in values:
-            print(f"{values[counter]:.2f} ", end = "")
-            counter +=1
+        print(f"{values[0]:>14.2f}% ", end = "")
+        print(f"{values[1]:>18.2f}$ ", end = "")
+        print(f"{values[2]:>13.2f}$ ", end = "")
 
         print("\nYour Company:", end = " ")
-        
-        print(f"{womanDistribution:.2f}% ", end ="")
-        print(f"{medianPay:.2f}$ ", end = "")
-        print(f"{payGap:.2f}$ ", end ="")
+        print(f"{womanDistribution:>10.2f}% ", end ="")
+        print(f"{medianPay:>18.2f}$ ", end = "")
+        print(f"{payGap:>13.2f}$ ", end ="")
 
-    
+        distDiff = womanDistribution - values[0]
+        payDiff = medianPay - values[1]
+        gapDiff = payGap - values[2]
+
+        print("\n\nResults:")
+        resultPrint(distDiff, "proportion of females")
+        resultPrint(payDiff, "median pay")
+        resultPrint(gapDiff, "gender pay gap")
 
     if selectIndustry == -1:
         break
