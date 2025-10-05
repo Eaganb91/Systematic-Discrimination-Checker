@@ -11,7 +11,7 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         "jobTitle": 'string',        # Use dedicated Pandas string type
         "yearsAtCompany": 'Int64',
         "hiredBy": 'string',
-        "promotedLastBy": 'Int64Y',
+        "promotedLastBy": 'Int64',
         "performanceMetric": float,  # Added the missing column
         "age": 'Int64',
         "gender": 'Int64',
@@ -35,7 +35,7 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         ageCorrelation=float(input("enter the correlation between age and pay"))
     if(correlationVariance==None):
         correlationVariance=int(input("enter how concistent the correlation is out of 100"))
-
+    numPromoters=4
     numManage=10
     #formula for pay change is going to be newPay=pay*(mean(age)-age)*ageCorrelation*correlationVariance
     print("generating", numEmployee, "employees")
@@ -47,8 +47,8 @@ def createData(numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=N
         else:
             manage=0
         seed=random.randint(1,100)
-
-        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,years+random.randint(-yearsVariance,yearsVariance),None,random.randint(0,1),performanceAverage+random.randint(-performanceVariance,performanceVariance),age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
+        
+        new_row_df = pd.DataFrame([createEmployee(i, pay-random.randint(-payVariance,payVariance),manage,years+random.randint(-yearsVariance,yearsVariance),None,random.randint(0,numPromoters),performanceAverage+random.randint(-performanceVariance,performanceVariance),age+random.randint(-ageVariance,ageVariance),pick(seed,genderRatio),pick(seed,isImigrantRatio),pick(seed,phyisicalDisabilityRatio),pick(seed,neurodivergentRatio),pick(seed,recordOfOffences))], columns=data.columns)
         data = pd.concat([data, new_row_df], ignore_index=True)
         data.loc[i,"pay"]=data.loc[i,"pay"]-((age-data.loc[i,"age"])*ageCorrelation*random.randint(0,correlationVariance)/100)
     print(data)
@@ -82,7 +82,6 @@ def printCorrelation(correlation,pValue,col1,col2):
 
 
 def compareProtected(df,correlator):
-    print("Checking correlation for a correlation between pay and catagories protected under the Ontario human rights code:")
     printCorrelation(*(checkCorrelation(df,correlator,"age")))
     printCorrelation(*(checkCorrelation(df,correlator,"gender")))
     printCorrelation(*(checkCorrelation(df,correlator,"isImmigrant")))
@@ -92,13 +91,19 @@ def compareProtected(df,correlator):
 
 
 def checkPromoter(df):
-    promoters=[]
-    for i in df.loc[:"promotedLastBy"]:
-        promoters.append(i)
+    promoters=df['promotedLastBy'].tolist()
     promoters=set(promoters)
     for p in promoters:
-        compareProtected(df,"promotedLastBy")
+        dfCopy =df.copy(deep=True)
+        # 1. Select the column and set all values to 0
+        dfCopy['promotedLastBy'] = 0
 
+        # 2. Use .loc to select only the rows where the original value *was* 'p' 
+        #    and set the corresponding new value to 1
+        dfCopy.loc[df['promotedLastBy'] == p, 'promotedLastBy'] = 1
+        print(dfCopy)
+        print("checking if employer",p,"has systematic bias in there promotion decisions")
+        compareProtected(dfCopy,"promotedLastBy")
     
 #numEmployee=None,pay=None,payVariance=None,age=None,ageVariance=None,ageCorrelation=None,correlationVariance=None
 def main():
